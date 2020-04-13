@@ -45,13 +45,14 @@ class FilmDetail extends React.Component{
         let imgUri = this.getImageFromApi(this.state.img)
         return ( 
                <ScrollView style={styles.main_container}>
-                    <Image
-                    key={imgUri}
-                    style={styles.image}
-                    source={{uri: this.state.img != undefined ? imgUri : "../assets/loading.png", cache: 'reload'}}
-                    />
-    
+                    
                     <Text> {film.title } </Text>
+                    {/* image from network must have width and heigth, 
+                    when the image not charging from the api on the firt call i have to put here on personal state  */}
+                    <Image
+                    style={styles.image}
+                    source={{uri: imgUri}}
+                    />
                     <Text> {film.overview} </Text>
                     <Text>Genres: {film.genres && film.genres.map((g,i)=>{
                          return g.name
@@ -69,6 +70,14 @@ const styles = StyleSheet.create({
     main_container:{
         flex:1,
     },
+    image:{
+        flex: 1,
+        width: "100%",
+        height: 200,
+        flexDirection:'row',
+        flexWrap: 'wrap'
+    }
+    ,
     loading_container: {
         position: 'absolute',
         left: 0,
