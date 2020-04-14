@@ -1,6 +1,7 @@
 import React from 'react'
 import {Text,View,StyleSheet,ActivityIndicator,ScrollView,Image} from 'react-native'
-import {getFilmFromId} from '../API/TMDBApi'
+import {getFilmFromId, getImageFromApi} from '../API/TMDBApi'
+import {connect} from 'react-redux'
 class FilmDetail extends React.Component{
     constructor(props){
         super(props)
@@ -33,26 +34,23 @@ class FilmDetail extends React.Component{
           )
         }
       }
-    getImageFromApi (name) {
-        return 'https://image.tmdb.org/t/p/w300' + name
-      }
+    
       
     render() {
+        console.log(this.props);
         
-        const {film} =  this.state 
-        console.log(this.getImageFromApi(this.state.img));
-        
-        let imgUri = this.getImageFromApi(this.state.img)
+        const {film} =  this.state         
         return ( 
                <ScrollView style={styles.main_container}>
-                    
-                    <Text> {film.title } </Text>
-                    {/* image from network must have width and heigth, 
+                    {/* image from network must have an heigth, 
                     when the image not charging from the api on the firt call i have to put here on personal state  */}
                     <Image
-                    style={styles.image}
-                    source={{uri: imgUri}}
+                    style={styles.image} 
+                    source={{uri: getImageFromApi(this.state.img)}}
                     />
+                    <Text style={styles.title}> {film.title } </Text>
+                   
+                    
                     <Text> {film.overview} </Text>
                     <Text>Genres: {film.genres && film.genres.map((g,i)=>{
                          return g.name
@@ -72,10 +70,15 @@ const styles = StyleSheet.create({
     },
     image:{
         flex: 1,
-        width: "100%",
         height: 200,
         flexDirection:'row',
         flexWrap: 'wrap'
+    },
+    title:{
+        fontWeight:'bold',
+        flex:1,
+        textAlign:'center',
+        fontSize: 35
     }
     ,
     loading_container: {
@@ -88,4 +91,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     }
 })
-export default FilmDetail
+const mapStateToProps = (state)=>{
+    return {
+        favoritesFilm : state.favoritesFilms
+    }
+}
+export default connect(mapStateToProps)(FilmDetail)
