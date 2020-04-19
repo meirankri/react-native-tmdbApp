@@ -2,6 +2,8 @@ import React from 'react'
 import { View,ActivityIndicator, TextInput, Button,StyleSheet,FlatList } from 'react-native'
 import Movie from './Movie' 
 import {getFilmFromApi} from '../API/TMDBApi'
+import {connect} from 'react-redux'
+import FilmList from './FilmList'
 class Search extends React.Component{
     constructor(props){
         super(props)
@@ -12,10 +14,11 @@ class Search extends React.Component{
         this.page = 0
         this.totalPages = 0
         this.inputText = ""
+
     }
     //le underscore avant la function veut dire que c'est une methode privé
     //bien qu'on puisse l'utilisé partout, c'est une bonne pratique 
-    _loadFilm (){
+    _loadFilm = () =>{
         if(this.inputText !== ""){ 
             this.setState({isLoading:true})           
             getFilmFromApi(this.inputText, this.page+1).then((data) => {
@@ -29,6 +32,7 @@ class Search extends React.Component{
             }
         )
         }
+       // this._loadFilm = this._loadFilm.bind(this)
     }
     //pour reset la recherche de film et mettre à zero les differents variable
     _searchFilms(){
@@ -41,13 +45,17 @@ class Search extends React.Component{
         
         
     }
-    _displayDetailForFilm = (idFilm) => {
-        //pour navigué vers une nouvelle vue
-        this.props.navigation.navigate("detail", {id: idFilm })
-      }
+    
       //gerer le input
     _handleChange(text){
         this.inputText = text
+    }
+    _displayFavorite(id){
+        let favOrNot = this.props.favoritesFilms.findIndex(item => item.id === id)
+        if(favOrNot !== -1){
+            return true
+        }
+        return false
     }
     _displayLoading() {
         //function qui est un rendu et donc on peut mettre de la logique sans avoir 
@@ -74,14 +82,34 @@ class Search extends React.Component{
                     <TextInput onSubmitEditing={()=>this._searchFilms()} onChangeText={(text) => this._handleChange(text)} style={styles.input} placeholder='Titre du film'/>
                     <Button title="rechercher" onPress={()=> this._searchFilms() } />
                 </View>
-                <FlatList
+                {/* ici on crée un component FilmList qui va gerer une liste de films ce qui permet de detacher la recuperation des films
+                avec l'affichage */}
+                <FilmList
+                // C'est bien le component Search qui récupère les films depuis l'API et on les transmet ici pour que le component FilmList les affiche
+                films={this.state.films} 
+                navigation={this.props.navigation} // Ici on transmet les informations de navigation pour permettre au component FilmList de naviguer vers le détail d'un film
+                loadFilms={this._loadFilm} // _loadFilm charge les films suivants, ça concerne l'API, le component FilmList va juste appeler cette méthode quand l'utilisateur aura parcouru tous les films et c'est le component Search qui lui fournira les films suivants
+                page={this.page}
+                totalPages={this.totalPages} // les infos page et totalPages vont être utile, côté component FilmList, pour ne pas déclencher l'évènement pour charger plus de film si on a atteint la dernière page
+                favoritesFilms={this.props.favoritesFilms}
+                >
+
+                </FilmList>
+                {/* <FlatList
+                    //dans extractData on recupere les films que l'on envoie a l'item qui va afficher notre liste,
+                    //et verifier si le film est dans la liste des favoris ou pas, ça permet de ne pas avoir a re render
+                    //tout les composants films mais seulement ceux qui sont favoris
+                    extraData={this.props.favoritesFilms}
                     //data sont les donnés à affiché
                     data={this.state.films}
                     // keyExtractor est l'equvalent de key={id} dans react, il faut une chaine de caractere
                     keyExtractor={(item) => item.id.toString()}
                     //renderItem boucle sur toutes les donnés et fait un rendu du component qu'on lui donne,
                     //movie reçoie une function pour naviguer vers le detail en props
-                    renderItem={({item}) => <Movie displayDetailForFilm={this._displayDetailForFilm} data={item   } />}
+                    renderItem={({item}) => <Movie 
+                    isFilmFavorite={(this.props.favoritesFilms.findIndex(film => film.id === item.id) !== -1) ? true : false}
+
+                    displayDetailForFilm={this._displayDetailForFilm} data={item   } />}
                     //on definit le onEndReachedThreshold a la fin du scroll
                     onEndReachedThreshold={0.5}
                     // la function qui se declenche quand on atteint le onEndReachedThreshold
@@ -89,7 +117,7 @@ class Search extends React.Component{
                         if(this.page < this.totalPages) this._loadFilm()
                         
                     }}
-                />
+                /> */}
                 {this._displayLoading()}
             </View>
             
@@ -125,4 +153,9 @@ const styles = StyleSheet.create({
         paddingLeft: 5
     }
 })
-export default Search
+const mapStateToProps = (state)=>{
+    return {
+        favoritesFilms : state.favoritesFilms
+    }
+} 
+export default connect(mapStateToProps)(Search)

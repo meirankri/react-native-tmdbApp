@@ -15,7 +15,7 @@ function toggleFavorite(state = initialState,action){
             else{
                 return {
                     ...state,
-                    favoritesFilms:[...favoritesFilms, action.value]
+                    favoritesFilms:[...state.favoritesFilms, action.value]
                 }
             }
         default:

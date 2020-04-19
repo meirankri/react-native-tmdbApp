@@ -1,5 +1,5 @@
 import React from 'react'
-import {Text,View,StyleSheet,ActivityIndicator,ScrollView,Image} from 'react-native'
+import {Text,View,StyleSheet,ActivityIndicator,ScrollView,Image, Button, TouchableOpacity} from 'react-native'
 import {getFilmFromId, getImageFromApi} from '../API/TMDBApi'
 import {connect} from 'react-redux'
 class FilmDetail extends React.Component{
@@ -10,6 +10,11 @@ class FilmDetail extends React.Component{
             img:'',
             isLoading: true
         }
+    }
+    _toggleFavorite(){
+        //au lieu de faire mapdispatchtoprops on le fait directement dans la function vu qu'il y en a qu'une seule  
+        const action  = {type: 'TOGGLE_FAVORITE', value:this.state.film}
+        this.props.dispatch(action)
     }
     componentDidMount(){
         getFilmFromId(this.props.route.params.id)
@@ -33,12 +38,20 @@ class FilmDetail extends React.Component{
             </View>
           )
         }
-      }
+    }
     
-      
-    render() {
-        console.log(this.props);
-        
+    
+    _displayImage(){
+        //les images statiques c'est recommandé par la doc d'avoir un require
+        let img = require('../assets/noneFavori.png')
+        if(this.props.favoritesFilms.findIndex(item => item.id === this.state.film.id) !== -1){
+            img = require('../assets/favori.png')
+        }
+        return (
+            <Image source={img} style={styles.favorite_image} />
+        )
+    }
+    render() {        
         const {film} =  this.state         
         return ( 
                <ScrollView style={styles.main_container}>
@@ -49,8 +62,12 @@ class FilmDetail extends React.Component{
                     source={{uri: getImageFromApi(this.state.img)}}
                     />
                     <Text style={styles.title}> {film.title } </Text>
-                   
-                    
+                   <TouchableOpacity
+                   style={styles.favorite_container}
+                   onPress={()=>this._toggleFavorite()} >
+                       {this._displayImage()}
+                   </TouchableOpacity>
+                    <Button title="favorite" onPress={()=> this._toggleFavorite()} />
                     <Text> {film.overview} </Text>
                     <Text>Genres: {film.genres && film.genres.map((g,i)=>{
                          return g.name
@@ -74,6 +91,14 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         flexWrap: 'wrap'
     },
+    favorite_container:{
+        alignItems: 'center'
+    },
+    favorite_image:{
+        width:40,
+        height:40
+    }
+    ,
     title:{
         fontWeight:'bold',
         flex:1,
@@ -93,7 +118,7 @@ const styles = StyleSheet.create({
 })
 const mapStateToProps = (state)=>{
     return {
-        favoritesFilm : state.favoritesFilms
+        favoritesFilms : state.favoritesFilms
     }
 }
 export default connect(mapStateToProps)(FilmDetail)
