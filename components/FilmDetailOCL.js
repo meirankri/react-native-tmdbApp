@@ -28,7 +28,7 @@ class FavoritesFilms extends React.Component {
     // Le film n'est pas dans nos favoris, on n'a pas son détail
     // On appelle l'API pour récupérer son détail
     this.setState({ isLoading: true })
-    getFilmFromId(this.props.navigation.state.params.idFilm).then(data => {
+    getFilmFromId(this.props.navigation.state.params.id).then(data => {
       this.setState({
         film: data,
         isLoading: false

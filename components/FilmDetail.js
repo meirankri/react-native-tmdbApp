@@ -7,7 +7,6 @@ class FilmDetail extends React.Component{
         super(props)
         this.state = {
             film:"",
-            img:'',
             isLoading: true
         }
     }
@@ -17,10 +16,18 @@ class FilmDetail extends React.Component{
         this.props.dispatch(action)
     }
     componentDidMount(){
+        const favoriteFilmIndex = this.props.favoritesFilms.findIndex(item => item.id === this.props.route.params.id)
+        if(favoriteFilmIndex !== -1){
+            this.setState({
+                film: this.props.favoritesFilms[favoriteFilmIndex],
+                isLoading:false,
+            })
+            return
+        }
         getFilmFromId(this.props.route.params.id)
         .then((data)=>{
             
-            this.setState({film:data,img:data.backdrop_path, isLoading:false})
+            this.setState({film:data, isLoading:false})
         })
         
     }
@@ -52,14 +59,16 @@ class FilmDetail extends React.Component{
         )
     }
     render() {        
-        const {film} =  this.state         
+        const {film} =  this.state  
+        console.log(getImageFromApi(film.backdrop_path));
+               
         return ( 
                <ScrollView style={styles.main_container}>
                     {/* image from network must have an heigth, 
                     when the image not charging from the api on the firt call i have to put here on personal state  */}
                     <Image
                     style={styles.image} 
-                    source={{uri: getImageFromApi(this.state.img)}}
+                    source={{uri: getImageFromApi(film.backdrop_path)}}
                     />
                     <Text style={styles.title}> {film.title } </Text>
                    <TouchableOpacity

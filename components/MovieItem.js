@@ -3,7 +3,7 @@
 import React from 'react'
 import { StyleSheet, View, Text, Image ,TouchableOpacity} from 'react-native'
 import { getImageFromApi} from '../API/TMDBApi'
-class Movie extends React.Component {
+class MovieItem extends React.Component {
 
   _displayFavorite(){
     if(this.props.isFilmFavorite){
@@ -92,4 +92,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Movie
+export default MovieItem

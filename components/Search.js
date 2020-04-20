@@ -1,6 +1,6 @@
 import React from 'react'
 import { View,ActivityIndicator, TextInput, Button,StyleSheet,FlatList } from 'react-native'
-import Movie from './Movie' 
+import Movie from './MovieItem' 
 import {getFilmFromApi} from '../API/TMDBApi'
 import {connect} from 'react-redux'
 import FilmList from './FilmList'
@@ -19,7 +19,7 @@ class Search extends React.Component{
     //le underscore avant la function veut dire que c'est une methode privé
     //bien qu'on puisse l'utilisé partout, c'est une bonne pratique 
     _loadFilm = () =>{
-        if(this.inputText !== ""){ 
+        if(this.inputText.length  > 0 ){ 
             this.setState({isLoading:true})           
             getFilmFromApi(this.inputText, this.page+1).then((data) => {
                 //les pages c'est pour la pagination
@@ -91,7 +91,6 @@ class Search extends React.Component{
                 loadFilms={this._loadFilm} // _loadFilm charge les films suivants, ça concerne l'API, le component FilmList va juste appeler cette méthode quand l'utilisateur aura parcouru tous les films et c'est le component Search qui lui fournira les films suivants
                 page={this.page}
                 totalPages={this.totalPages} // les infos page et totalPages vont être utile, côté component FilmList, pour ne pas déclencher l'évènement pour charger plus de film si on a atteint la dernière page
-                favoritesFilms={this.props.favoritesFilms}
                 >
 
                 </FilmList>

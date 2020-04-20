@@ -2,9 +2,9 @@
 
 import React from 'react'
 import { StyleSheet, FlatList } from 'react-native'
-import Movie from './Movie'
+import MovieItem from './MovieItem'
 import { connect } from 'react-redux'
-import FavoritesFilms from './FavoritesFilms'
+import FavoritesFilms from './FilmDetailOCL'
 
 class FilmList extends React.Component {
 
@@ -16,7 +16,6 @@ class FilmList extends React.Component {
   }
 
   _displayDetailForFilm = (idFilm) => {
-    console.log("Display film " + idFilm)
     // On a récupéré les informations de la navigation, on peut afficher le détail du film
     this.props.navigation.navigate('detail', {id: idFilm})
   }
@@ -29,9 +28,11 @@ class FilmList extends React.Component {
           extraData={this.props.favoritesFilms}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({item}) => (
-           <Movie 
+           <MovieItem
+            data={item} 
             isFilmFavorite={(this.props.favoritesFilms.findIndex(film => film.id === item.id) !== -1) ? true : false}
-            displayDetailForFilm={this._displayDetailForFilm} data={item} />
+            displayDetailForFilm={this._displayDetailForFilm} 
+             />
           )}
           onEndReachedThreshold={0.5}
           onEndReached={() => {
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
-    favoritesFilm: state.favoritesFilm
+    favoritesFilms: state.favoritesFilms
   }
 }
 
